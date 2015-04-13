@@ -1,0 +1,21 @@
+{
+  "name": "express-smart-controllers",
+  "version": "0.1.0",
+  "description": "Automatically loads controllers and routes in Node.js Express, using a convention-over-configuration paradigm.",
+  "main": "express-smart-controllers.js",
+  "scripts": {
+    "test": "node ./node_modules/mocha/bin/mocha ./test/*.spec.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StefanoDalpiaz/express-smart-controllers.git"
+  },
+  "author": "Stefano Dalpiaz",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^2.2.0",
+    "express": "^4.12.3",
+    "mocha": "^2.2.4",
+    "supertest": "^0.15.0"
+  }
+}
