@@ -1,6 +1,6 @@
 {
   "name": "express-smart-controllers",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Automatically loads controllers and routes in Node.js Express, using a convention-over-configuration paradigm.",
   "main": "express-smart-controllers.js",
   "scripts": {

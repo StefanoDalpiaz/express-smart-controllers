@@ -1,5 +1,7 @@
 # express-smart-controllers
 
+**DOCUMENTATION UNDER CONSTRUCTION!**
+
 `express-smart-controllers` is a [node.js](https://nodejs.org/) module to be used with [Express](http://expressjs.com/). It simplifies route management by automatically loading controllers and generating routes based on controller methods.
 
 ## Installation
@@ -23,8 +25,15 @@ In your Express application, simply require the module and call its `load` metho
 
 The above code will load all controllers located on the default directory `./controllers`, and will parse all its methods and properties to generate routes.
 
+It is also possible to load routes using an Express router instead of the Express application:
 
-## Controller files
+    var router = express.Router();
+    smartControllers.load(router);
+    app.use('/router-base-url', router);
+
+## Controllers
+
+Controller files should export a simple object with functions. Those functions will be used
 
 Below is an example of a controller file:
 
