@@ -6,6 +6,8 @@ module.exports = {
 		"/fooAbsolute" : "_absolute",
 		"{POST} explicit" : "_postExplicit",
 		"{GET} explicitGet" : "_getExplicit",
+		"oneParameterExplicit/:one" : "_oneParameterExplicit",
+		"twoParametersExplicit/:one/:two" : "_twoParametersExplicit",
 	},
 
 	get: function() {
@@ -42,6 +44,22 @@ module.exports = {
 
 	_absolute: function() {
 		this.res.send('absolute');
+	},
+
+	oneParameterImplicit: function(one) {
+		this.res.send('oneParameterImplicit ' + one);
+	},
+
+	twoParametersImplicit: function(one, two) {
+		this.res.send('twoParametersImplicit ' + one + ' ' + two);
+	},
+
+	_oneParameterExplicit: function(one) {
+		this.res.send('oneParameterExplicit ' + one);
+	},
+
+	_twoParametersExplicit: function(one, two) {
+		this.res.send('twoParametersExplicit ' + one + ' ' + two);
 	}
 
 };

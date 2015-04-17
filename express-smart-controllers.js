@@ -66,6 +66,20 @@ ExpressControllers.prototype.requireAuthentication = function() {
 };
 
 /**
+ * Gets the parameter names that a function accepts
+ *
+ * @param {function} fn The function to reflect
+ *
+ * @returns {array} A list of parameter names
+ */
+ExpressControllers.prototype.getParameterNames = function(fn) {
+	// http://stackoverflow.com/questions/6921588/is-it-possible-to-reflect-the-arguments-of-a-javascript-function
+	var args = fn.toString().match (/^\s*function\s+(?:\w*\s*)?\((.*?)\)/);
+	args = args ? (args[1] ? args[1].trim().split (/\s*,\s*/) : []) : null;
+	return args;
+};
+
+/**
  * Adds a route handler to the Express router
  *
  * @param {string} method The HTTP method to use (possible values: 'get, 'post', 'put', 'patch', 'delete')
@@ -75,7 +89,7 @@ ExpressControllers.prototype.requireAuthentication = function() {
  * @param {boolean} authenticate Whether the current route requires authentication
  * @param {object} controllerDef The user-defined controller object
  */
-ExpressControllers.prototype.addRoute = function(method, pathName, viewBaseName, actionName, authenticate, controllerDef) {
+ExpressControllers.prototype.addRoute = function(method, pathName, viewBaseName, actionName, args, authenticate, controllerDef) {
 	// addedClasses will act as a cache, so that the generated classes can be reused across routes for the same controller
 	if (!this.addedClasses)
 		this.addedClasses = [];
@@ -96,7 +110,7 @@ ExpressControllers.prototype.addRoute = function(method, pathName, viewBaseName,
 
 			// define a render method, that allows the view path to be implicit
 			this.render = function() {
-				var viewName = actionName;
+				var viewName = actionName.replace(implicitAuthPattern, '').replace(implicitIgnoreAuthPattern, '');
 				var data = {};
 				if (typeof(arguments[0]) === 'string') {
 					// a view name was specified, so the data was passed as second argument
@@ -119,8 +133,11 @@ ExpressControllers.prototype.addRoute = function(method, pathName, viewBaseName,
 
 	// the function that will be passed to the Express router to handle the current route
 	var actionFn = function(req, res) {
+		actionArgs = (args || []).map(function(arg) {
+			return req.params[arg];
+		});
 		var controller = new ControllerClass(req, res, method, pathName, viewBaseName, actionName, authenticate);
-		controller[actionName]();
+		controller[actionName].apply(controller, actionArgs);
 	};
 
 	if (authenticate) {
@@ -231,7 +248,16 @@ ExpressControllers.prototype.loadExplicitRoutes = function(controllerData) {
 					else
 						pathName = pathName.substr(1);
 				}
-				this.addRoute(method, pathName, controllerData.viewBaseName, actionName, authenticate, controller);
+
+				// check if the path contains dynamic parameters. They will be passed as function arguments to the handler
+				var args = [];
+				var splitPath = pathName.split('/');
+				for (var i = 0; i < splitPath.length; i++) {
+					if (splitPath[i].charAt(0) === ':')
+						args.push(splitPath[i].replace(/^\:/, ''));
+				}
+
+				this.addRoute(method, pathName, controllerData.viewBaseName, actionName, args, authenticate, controller);
 			}
 		}
 	}
@@ -267,7 +293,15 @@ ExpressControllers.prototype.loadImplicitRoutes = function(controllerData) {
 					pathName = pathName.charAt(0).toLowerCase() + pathName.substr(1);
 			}
 
-			this.addRoute(method, controllerData.controllerName + (pathName ? '/' + pathName : ''), controllerData.viewBaseName, fnName, authenticate, controller);
+			// check if the function accepts arguments. If it does, route paramters will be created
+			var args = this.getParameterNames(controller[fnName]);
+			if (args) {
+				for (var i = 0; i < args.length; i++) {
+					pathName += '/:' + args[i];
+				}
+			}
+
+			this.addRoute(method, controllerData.controllerName + (pathName ? '/' + pathName : ''), controllerData.viewBaseName, fnName, args, authenticate, controller);
 
 		}
 	}

@@ -110,6 +110,26 @@ describe('express-smart-controllers', function() {
 			expect(addedRoutes).to.be.an('array')
 				.and.to.contain('POST: /foo/explicit');
 		});
+
+		it('should load implicit with one parameter', function() {
+			expect(addedRoutes).to.be.an('array')
+				.and.to.contain('GET: /foo/oneParameterImplicit/:one');
+		});
+
+		it('should load implicit with two parameters', function() {
+			expect(addedRoutes).to.be.an('array')
+				.and.to.contain('GET: /foo/twoParametersImplicit/:one/:two');
+		});
+
+		it('should load explicit with one parameter', function() {
+			expect(addedRoutes).to.be.an('array')
+				.and.to.contain('GET: /foo/oneParameterExplicit/:one');
+		});
+
+		it('should load explicit with two parameters', function() {
+			expect(addedRoutes).to.be.an('array')
+				.and.to.contain('GET: /foo/twoParametersExplicit/:one/:two');
+		});
 	});
 
 	describe('route handling', function() {
@@ -178,6 +198,30 @@ describe('express-smart-controllers', function() {
 			request(app)
 				.post('/foo/explicit')
 				.expect(200, 'postExplicit', done);
+		});
+
+		it('should handle implicit with one parameter', function(done) {
+			request(app)
+				.get('/foo/oneParameterImplicit/first')
+				.expect(200, 'oneParameterImplicit first', done);
+		});
+
+		it('should handle implicit with two parameters', function(done) {
+			request(app)
+				.get('/foo/twoParametersImplicit/first/second')
+				.expect(200, 'twoParametersImplicit first second', done);
+		});
+
+		it('should handle explicit with one parameter', function(done) {
+			request(app)
+				.get('/foo/oneParameterExplicit/first')
+				.expect(200, 'oneParameterExplicit first', done);
+		});
+
+		it('should handle explicit with two parameters', function(done) {
+			request(app)
+				.get('/foo/twoParametersExplicit/first/second')
+				.expect(200, 'twoParametersExplicit first second', done);
 		});
 	});
 });
