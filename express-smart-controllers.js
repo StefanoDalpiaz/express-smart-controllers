@@ -104,9 +104,10 @@ ExpressControllers.prototype.addRoute = function(method, pathName, viewBaseName,
 	else {
 		// create a class that uses the current controller definition as a prototype. This class will be resused
 		// across all of the routes for the same controller
-		ControllerClass = function(req, res, method, pathName, viewBaseName, actionName, authenticate) {
+		ControllerClass = function(req, res, next, method, pathName, viewBaseName, actionName, authenticate) {
 			this.req = req;
 			this.res = res;
+			this.next = next;
 
 			// define a render method, that allows the view path to be implicit
 			this.render = function() {
@@ -132,11 +133,11 @@ ExpressControllers.prototype.addRoute = function(method, pathName, viewBaseName,
 	}
 
 	// the function that will be passed to the Express router to handle the current route
-	var actionFn = function(req, res) {
+	var actionFn = function(req, res, next) {
 		actionArgs = (args || []).map(function(arg) {
 			return req.params[arg];
 		});
-		var controller = new ControllerClass(req, res, method, pathName, viewBaseName, actionName, authenticate);
+		var controller = new ControllerClass(req, res, next, method, pathName, viewBaseName, actionName, authenticate);
 		controller[actionName].apply(controller, actionArgs);
 	};
 
