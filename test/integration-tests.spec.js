@@ -61,6 +61,21 @@ describe('express-smart-controllers', function() {
 			});
 		});
 
+		it('should load default controller default get', function() {
+			expect(addedRoutes).to.be.an('array')
+				.and.to.contain('GET: /');
+		});
+
+		it('should load default controller implicit get', function() {
+			expect(addedRoutes).to.be.an('array')
+				.and.to.contain('GET: /foobar');
+		});
+
+		it('should load default controller explicit get', function() {
+			expect(addedRoutes).to.be.an('array')
+				.and.to.contain('GET: /foobaz');
+		});
+
 		it('should load default get', function() {
 			expect(addedRoutes).to.be.an('array')
 				.and.to.contain('GET: /foo');
@@ -138,6 +153,24 @@ describe('express-smart-controllers', function() {
 			smartControllers.load(app, { controllerPath: controllerPath }, function() {
 				done();
 			});
+		});
+
+		it('should handle default controller default get', function(done) {
+			request(app)
+				.get('/')
+				.expect(200, 'default index', done);
+		});
+
+		it('should handle default controller implicit get', function(done) {
+			request(app)
+				.get('/foobar')
+				.expect(200, 'default foobar', done);
+		});
+
+		it('should handle default controller explicit get', function(done) {
+			request(app)
+				.get('/foobaz')
+				.expect(200, 'default foobaz', done);
 		});
 
 		it('should handle default get', function(done) {

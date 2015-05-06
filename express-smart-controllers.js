@@ -142,10 +142,10 @@ ExpressControllers.prototype.addRoute = function(method, pathName, viewBaseName,
 	};
 
 	if (authenticate) {
-		this.router[method]('/' + pathName, this.requireAuthentication(), actionFn);
+		this.router[method]('/' + pathName.replace(/^\//, ''), this.requireAuthentication(), actionFn);
 	}
 	else {
-		this.router[method]('/' + pathName, actionFn);
+		this.router[method]('/' + pathName.replace(/^\//, ''), actionFn);
 	}
 };
 
@@ -240,12 +240,13 @@ ExpressControllers.prototype.loadExplicitRoutes = function(controllerData) {
 				// check method name
 				var method = this.getMethod(pathName, true);
 				pathName = pathName.replace(explicitMethodPattern, '');
+				var controllerName = controllerData.controllerName == "default" ? "" : controllerData.controllerName;
 
 				if (pathName) {
 					// explicit paths starting with '/' are relative to the router root url, while paths starting with
 					// something else are relative to the current controller base url
 					if (pathName.charAt(0) !== '/')
-						pathName = controllerData.controllerName + '/' + pathName;
+						pathName = controllerName + '/' + pathName;
 					else
 						pathName = pathName.substr(1);
 				}
@@ -302,7 +303,9 @@ ExpressControllers.prototype.loadImplicitRoutes = function(controllerData) {
 				}
 			}
 
-			this.addRoute(method, controllerData.controllerName + (pathName ? '/' + pathName : ''), controllerData.viewBaseName, fnName, args, authenticate, controller);
+			var controllerName = controllerData.controllerName == "default" ? "" : controllerData.controllerName;
+
+			this.addRoute(method, controllerName + (pathName ? '/' + pathName : ''), controllerData.viewBaseName, fnName, args, authenticate, controller);
 
 		}
 	}
