@@ -73,13 +73,14 @@ There are two different ways of creating a route: **implicit routes** and **expl
 
 Implicit routes can be simply defined by creating a function method in a controller object. The module will take care of creating the route automatically. Every function in the controller (with a few exceptions described later on) will correspond to a route. The generated routes will be used to handle the appropriate HTTP method, with a path that follows the pattern:
 
-    /controllerName/actionName/optionalParameter1/optionalParameter2/...
+    [/controllerName]/actionName[/parameter1/parameter2/parameter3/...]
+
 
 The route will be created by extracting the following information:
 
  - **HTTP method** *(GET, POST, PUT, PATCH or DELETE)*: if the name of the function in the controller starts with an HTTP method (e.g. `getUser`, `postUser`, `deleteUser`, etc.), then that method will be used to handle that action. If the action has any other name (e.g. `news`, `home`, `about`, etc.), the GET method will be used.
 
- - **controllerName**: the controller name will be used as the first segment for the generated route URL. If not manually specified, the name of the file will be used, cleaned of the *.js* extension and any *Controller* or *Ctrl* suffix. For example, a controller that is defined in a file called `userController.js`, will have `user` as its controller name. It is also possible to override this by manually specifying the value. To do that, simply create a string property in the controller called `controllerName`, and assign it the appropriate value.
+ - **controllerName**: the controller name will be used as the first segment for the generated route URL. If not manually specified, the name of the file will be used, cleaned of the *.js* extension and any *Controller* or *Ctrl* suffix. For example, a controller that is defined in a file called `userController.js`, will have `user` as its controller name. It is also possible to override this by manually specifying the value. To do that, simply create a string property in the controller called `controllerName`, and assign it the appropriate value. Whenever the controller is named "default" (whether by calling the file "defaultController.js" of by specifying the `controllerName: 'default'` property), then the *controllerName* segment of the URL will be omitted.
 
  - **actionName**: the action name will be used as the second segment for the generated route URL. Its value will be parsed from the name of the function that defines the route, minus the HTTP method name and other special configration characters described in later sections. For example, the methods `user`, getUser`, `postUser`, `deleteUser` will all take the action name `user`.
 
@@ -113,7 +114,7 @@ In many cases, you might want to define a route with a URL that does not strictl
 The key of each property will be the path to be used for the route. There are two ways of defining a path: absolute and relative.
 
  - Absolute paths start with a forward slash */* and will handle URLs relative to the application root.
- 
+
  - Relative paths do not start with a forward slash, and will handle the paths relative to the current controller name. For example the second route defined above will handle the path */controllerName/custom/relative/path*.
 
 By default, all explicit routes will handle the HTTP GET method. It is possible to specify the method by prefixing the path with the verb name wrapped in curly braces. Example:
