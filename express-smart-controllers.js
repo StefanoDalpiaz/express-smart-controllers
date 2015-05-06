@@ -142,10 +142,10 @@ ExpressControllers.prototype.addRoute = function(method, pathName, viewBaseName,
 	};
 
 	if (authenticate) {
-		this.router[method]('/' + pathName.replace(/^\//, ''), this.requireAuthentication(), actionFn);
+		this.router[method]('/' + pathName.replace(/^\/+/, ''), this.requireAuthentication(), actionFn);
 	}
 	else {
-		this.router[method]('/' + pathName.replace(/^\//, ''), actionFn);
+		this.router[method]('/' + pathName.replace(/^\/+/, ''), actionFn);
 	}
 };
 

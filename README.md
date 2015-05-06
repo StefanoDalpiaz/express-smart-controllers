@@ -75,6 +75,7 @@ Implicit routes can be simply defined by creating a function method in a control
 
     [/controllerName]/actionName[/parameter1/parameter2/parameter3/...]
 
+Segments that are wrapped in square brackets in the pattern above are optional, depending on the route values, described below.
 
 The route will be created by extracting the following information:
 
