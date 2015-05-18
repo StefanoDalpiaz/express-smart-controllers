@@ -299,7 +299,7 @@ ExpressControllers.prototype.loadImplicitRoutes = function(controllerData) {
 			var args = this.getParameterNames(controller[fnName]);
 			if (args) {
 				for (var i = 0; i < args.length; i++) {
-					pathName += '/:' + args[i];
+					pathName += (pathName ? '/' : '') + ':' + args[i];
 				}
 			}
 
