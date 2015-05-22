@@ -34,6 +34,7 @@ describe('express-smart-controllers', function() {
 				var addedRoutes = getAllRoutes(app._router.stack);
 				expect(addedRoutes).to.be.an('array')
 					.and.to.contain('GET: /foo')
+					.and.to.contain('GET: /level/another')
 					.and.to.contain('GET: /bar');
 				done();
 			});
@@ -45,6 +46,7 @@ describe('express-smart-controllers', function() {
 				var addedRoutes = getAllRoutes(router.stack);
 				expect(addedRoutes).to.be.an('array')
 					.and.to.contain('GET: /foo')
+					.and.to.contain('GET: /level/another')
 					.and.to.contain('GET: /bar');
 				done();
 			});
@@ -104,6 +106,21 @@ describe('express-smart-controllers', function() {
 		it('should load explicit get', function() {
 			expect(addedRoutes).to.be.an('array')
 				.and.to.contain('GET: /foo/explicitGet');
+		});
+
+		it('should load default implicit second level get', function() {
+			expect(addedRoutes).to.be.an('array')
+				.and.to.contain('GET: /level/another');
+		});
+
+		it('should load implicit second level get', function() {
+			expect(addedRoutes).to.be.an('array')
+				.and.to.contain('GET: /level/another/foo');
+		});
+
+		it('should load explicit second level get', function() {
+			expect(addedRoutes).to.be.an('array')
+				.and.to.contain('GET: /level/another/bar');
 		});
 
 		it('should load normal implicit', function() {
@@ -207,6 +224,24 @@ describe('express-smart-controllers', function() {
 			request(app)
 				.get('/foo/explicitGet')
 				.expect(200, 'getExplicit', done);
+		});
+
+		it('should handle default implicit second level get', function(done) {
+			request(app)
+				.get('/level/another')
+				.expect(200, 'another index', done);
+		});
+
+		it('should handle implicit second level get', function(done) {
+			request(app)
+				.get('/level/another/foo')
+				.expect(200, 'another foo', done);
+		});
+
+		it('should handle explicit second level get', function(done) {
+			request(app)
+				.get('/level/another/bar')
+				.expect(200, 'another bar', done);
 		});
 
 		it('should handle normal implicit', function(done) {

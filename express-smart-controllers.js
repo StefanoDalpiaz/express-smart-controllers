@@ -7,7 +7,7 @@
 
 var fs = require('fs');
 var path = require('path');
-var express = require('express');
+var recursive = require('recursive-readdir');
 
 var trimPattern = /^\s+|\s+$/g;
 var implicitMethodPattern = /^(get|post|put|patch|delete)/;
@@ -329,14 +329,16 @@ ExpressControllers.prototype.loadControllers = function(callback) {
 	var that = this;
 
 	// get a list of all files in the controllers directory
-	fs.readdir(controllersFullPath, function (err, files) {
+	recursive(controllersFullPath, function (err, files) {
 		if (err)
 			throw err;
 		files.forEach(function(file) {
-			if (file != '.' && file != '..') {
-				var controller = require(controllersFullPath + '/' + file);
+			var relativePath = path.relative(controllersFullPath, file).replace('\\', '/');
+			var extension = path.extname(relativePath);
+			if (extension === '.js') {
+				var controller = require(file);
 				if (controller) {
-					var controllerData = that.getControllerData(controller, file);
+					var controllerData = that.getControllerData(controller, relativePath);
 					that.loadExplicitRoutes(controllerData);
 					that.loadImplicitRoutes(controllerData);
 				}
