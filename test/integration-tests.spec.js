@@ -29,7 +29,7 @@ describe('express-smart-controllers', function() {
 	});
 
 	describe('init arguments', function() {
-		it('should load with app parameter', function() {
+		it('should load with app parameter', function(done) {
 			smartControllers.load(app, { controllerPath: controllerPath }, function() {
 				var addedRoutes = getAllRoutes(app._router.stack);
 				expect(addedRoutes).to.be.an('array')
@@ -39,10 +39,10 @@ describe('express-smart-controllers', function() {
 			});
 		});
 
-		it('should load with router parameter', function() {
+		it('should load with router parameter', function(done) {
 			var router = express.Router();
 			smartControllers.load(router, { controllerPath: controllerPath }, function() {
-				var addedRoutes = getAllRoutes(app._router.stack);
+				var addedRoutes = getAllRoutes(router.stack);
 				expect(addedRoutes).to.be.an('array')
 					.and.to.contain('GET: /foo')
 					.and.to.contain('GET: /bar');
