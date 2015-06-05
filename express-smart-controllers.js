@@ -42,9 +42,13 @@ var ExpressControllers = function(router, options) {
  *
  * @returns {function} The Express middleware function that will be used to check if the user is authenticated
  */
-ExpressControllers.prototype.requireAuthentication = function() {
+ExpressControllers.prototype.requireAuthentication = function(controllerDef, actionName, args) {
 	var that = this;
 	return function (req, res, next) {
+		var actionArgs = {};
+		(args || []).forEach(function(arg) {
+			actionArgs[arg] = req.params[arg];
+		});
 		// this is to avoid calling doCheck twice in cases when the custom checkAuthFn function returns a bool and calls the callback at the same time
 		var hasChecked = false;
 		var doCheck = function(isAuth) {
@@ -55,7 +59,7 @@ ExpressControllers.prototype.requireAuthentication = function() {
 		};
 		if (that.options.checkAuthFn) {
 			// checkAuthFn can return a bool immediately, or call a callback with a bool parameter
-			var isAuth = that.options.checkAuthFn(req, doCheck);
+			var isAuth = that.options.checkAuthFn({ request: req, controller: controllerDef, actionName: actionName, args: actionArgs }, doCheck);
 			if (isAuth === true || isAuth === false) {
 				return doCheck(isAuth);
 			}
@@ -122,6 +126,12 @@ ExpressControllers.prototype.addRoute = function(method, pathName, viewBaseName,
 					// a view name was not specified, so the data was passed as first argument
 					data = arguments[0] || data;
 				}
+				if (!data.controllerName)
+					data.controllerName = controllerDef.controllerName;
+				if (!data.controllerName)
+					data.actionName = controllerDef.actionName;
+				if (!data.currentUser)
+					data.currentUser = this.req.user;
 				res.render(viewBaseName + '/' + viewName, data);
 			};
 		};
@@ -134,7 +144,7 @@ ExpressControllers.prototype.addRoute = function(method, pathName, viewBaseName,
 
 	// the function that will be passed to the Express router to handle the current route
 	var actionFn = function(req, res, next) {
-		actionArgs = (args || []).map(function(arg) {
+		var actionArgs = (args || []).map(function(arg) {
 			return req.params[arg];
 		});
 		var controller = new ControllerClass(req, res, next, method, pathName, viewBaseName, actionName, authenticate);
@@ -142,7 +152,7 @@ ExpressControllers.prototype.addRoute = function(method, pathName, viewBaseName,
 	};
 
 	if (authenticate) {
-		this.router[method]('/' + pathName.replace(/^\/+/, ''), this.requireAuthentication(), actionFn);
+		this.router[method]('/' + pathName.replace(/^\/+/, ''), this.requireAuthentication(controllerDef, actionName, args), actionFn);
 	}
 	else {
 		this.router[method]('/' + pathName.replace(/^\/+/, ''), actionFn);
@@ -188,6 +198,8 @@ ExpressControllers.prototype.needsAuthentication = function(pathName, authentica
  */
 ExpressControllers.prototype.getControllerData = function(controller, fileName) {
 	var controllerName = controller.controllerName || fileName.replace(/(controller|ctrl)?\.js/i, '');
+	if (!controller.controllerName)
+		controller.controllerName = controllerName;
 	var viewBaseName = controller.viewBaseName || controllerName;
 	var authenticateAll = !!controller.authenticateAll;
 	return {
